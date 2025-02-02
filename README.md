@@ -340,7 +340,7 @@ void APuzzleSectorBase::ClearSector()
 
 --
 #### 시연 영상
-
+[![Video Label](http://img.youtube.com/vi/AHZqbCyBx_E/0.jpg)](https://youtu.be/AHZqbCyBx_E)
 ---
 
 #### 후기
