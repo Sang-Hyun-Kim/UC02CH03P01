@@ -7,12 +7,12 @@
 
 ### 과제 요구 사항
 - 필수
-  1.서로 다른 Actor 클래스 2개 이상 구현, 다른 동작 수행
+  1. 서로 다른 Actor 클래스 2개 이상 구현, 다른 동작 수행
   2. Tick 함수 기반 Transform 변경
   3. 언리얼 리플랙션 함수를 통한 Unreal Editor 에서 접근 가능 여부 
 - 도전
   1. FTimeHandle을 활용한 시간 제한과 카운트 다운
-  2.랜덤한 퍼즐 생성 
+  2. 랜덤한 퍼즐 생성 
 ---
 ### 프로젝트 흐름도
 ![Image](https://github.com/user-attachments/assets/507a3cc8-5f9c-4c04-9bf8-88369bf4ede4)
