@@ -334,6 +334,11 @@ void APuzzleSectorBase::ClearSector()
 }
 ```
 ---
+#### 그외 기타 구현
+- BP_FinishLine: 플레이어가 클리어 지점에 도달하면 Level BP를 통해 콜리전 Overlap 이벤트를 전달하도록 구현했습니다
+- Level BP : 실행시 레벨에 배치된 Puzzle Manager Ref 변수를 통해 레벨에 배치된 Puzzle Sector를 찾아 저장하도록 구현했고, 특정 조건에 따라 PuzzleManager가 각 Puzzle Sector를 초기화 하고 퍼즐 재생성하도록 흐름을 관리하도록 구현했습니다.
+
+--
 #### 시연 영상
 
 ---
