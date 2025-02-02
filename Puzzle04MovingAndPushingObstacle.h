@@ -25,17 +25,14 @@ protected:
 
 	virtual void BeginPlay() override;
 	
+	virtual void Tick(float DeltaTime) override;
 	UFUNCTION()
-	virtual void Moving();
+	virtual void Moving(float DeltaTime);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Puzzle|MovementSpeed")
     float MovementSpeed = 200.0f;
 
 	int movementflag = 1;
-
-    /** 이동 간격 (타이머 주기) */
-    UPROPERTY(EditAnywhere, Category = "Movement")
-    float MoveInterval = 0.5f; // 0.02초마다 이동
 
     /** 왕복 거리 */
     UPROPERTY(EditAnywhere, Category = "Movement")
@@ -46,7 +43,4 @@ protected:
 
     /** 시작 위치 */
     FVector StartLocation;
-
-    /** 타이머 핸들 */
-    FTimerHandle MoveTimerHandle;
 };
