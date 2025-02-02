@@ -80,9 +80,9 @@ PuzzleSetBase는 특정 퍼즐을 어떤 좌표에 배치할지에 대한 정보
 
 ##### 상속하는 서브 클래스들 
 
-- BP_PSet01_RotatingPlatforms:  회전하는 플랫폼들에서 떻어지지 않고 점프해 건너는 퍼즐 도안입니다. 
-- BP_PSet02_Bridge : 회전하는 통나무를 피하면서 떨어지지 않게 플랫폼 사이를 건너는 퍼즐 도안입니다. 
-- BP_PSet03_ElevatingPlatforms: 위아래로 반복 운동하는 플랫폼을 타고 건너는 퍼즐 도안입니다. 
+- BP_PSet01_RotatingPlatforms:  회전하는 플랫폼들에서 떻어지지 않고 점프해 건너는 퍼즐 도안입니다.
+- BP_PSet02_Bridge : 회전하는 통나무를 피하면서 떨어지지 않게 플랫폼 사이를 건너는 퍼즐 도안입니다.
+- BP_PSet03_ElevatingPlatforms: 위아래로 반복 운동하는 플랫폼을 타고 건너는 퍼즐 도안입니다.
 - BP_PSet04_BlinkingSet: 3초마다 비활성화되는 플랫폼을 타고 건너는 퍼즐 도안입나다.
 
  ---
@@ -106,7 +106,8 @@ public:
 
 ##### 상속하는 서브 클래스들
 
--Puzzle01Rotatingatform: 회전하는 플랫폼입니다. 프레임 단위로 회전하되, Gimbal Lock 현상이 발생해 해당 오류를 해결하기 위해 쿼터니안으로 회전을 하는 방법을 찾아 도입하였습니다. 또한 BeginPlay시 FMath::RandRange()로 랜덤한 속도를 생성해 각 퍼즐들이 랜덤한 속도로 회전하도록 구현했습니다.
+- Puzzle01Rotatingatform 
+	- 회전하는 플랫폼입니다. 프레임 단위로 회전하되, Gimbal Lock 현상이 발생해 해당 오류를 해결하기 위해 쿼터니안으로 회전을 하는 방법을 찾아 도입하였습니다. 또한 BeginPlay시 FMath::RandRange()로 랜덤한 속도를 생성해 각 퍼즐들이 랜덤한 속도로 회전하도록 구현했습니다.
 ```C++
 //header
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Puzzle|RotationSpeed")
@@ -126,9 +127,12 @@ void APuzzle03RotatingLog::RotatingRoot(float DeltaTime)
 
 ```
 
--Puzzle02BridgePlatform: 단순 건너기위한 발판입니다. 다만 추가 확장을 위해 상속받아 사용했습니다.
--Puzzle03RotatingLogPlatform: 위의 발판 플랫폼을 건너는 것을 방해하는 Yaw 축으로 회전하는 플랫폼입니다. 해당 플랫폼은 중심만 구현하였고, 이를 상속받는 BP에서 통나무를 달아 플레이어를 방해합니다. 해당 플랫폼 또한 게임 시작시 부여받은 랜덤한 속도로 회전합니다.
--Puzzle044MovingAndPushingObstacle: 위, 아래로 반복운동하는 플랫폼입니다. 처음 시작시 생성된 랜덤한 속도로 Y축을 엘레베이터 발판처럼 이동합니다. **이 또한 처음 잘못 지은 이름을 반성**하는 의미로 사용했고 상속 받는 BP는 제대로 ElevatingPlatform 이란 이름으로 생성했습니다.
+- Puzzle02BridgePlatform
+	- 단순 건너기위한 발판입니다. 다만 추가 확장을 위해 상속받아 사용했습니다.
+- Puzzle03RotatingLogPlatform
+	- 위의 발판 플랫폼을 건너는 것을 방해하는 Yaw 축으로 회전하는 플랫폼입니다. 해당 플랫폼은 중심만 구현하였고, 이를 상속받는 BP에서 통나무를 달아 플레이어를 방해합니다. 해당 플랫폼 또한 게임 시작시 부여받은 랜덤한 속도로 회전합니다.
+- Puzzle044MovingAndPushingObstacle
+	- 위, 아래로 반복운동하는 플랫폼입니다. 처음 시작시 생성된 랜덤한 속도로 Y축을 엘레베이터 발판처럼 이동합니다. **이 또한 처음 잘못 지은 이름을 반성**하는 의미로 사용했고 상속 받는 BP는 제대로 ElevatingPlatform 이란 이름으로 생성했습니다.
 ```C++
 // hearder
 	UFUNCTION()
@@ -184,7 +188,8 @@ void APuzzle04MovingAndPushingObstacle::Moving(float DeltaTime)
 
 ```
 
--Puzzle05BlinkPlatform: 특정 주기로 가시성, 충돌 여부를 반전시켜 플레이어의 시야에서 사라짐과 동시에 떨어트리는 목적으로 제작된 Platform 입니다. 해당 플랫폼은 Tick을 사용하지 않고 FTimerHandle과 TimerManager를 사용하여 특정 주기로 변경되도록 만든 것이 특징입니다. 각 설정값들은 UE Editor에서 변경 및 수정 가능합니다.
+- Puzzle05BlinkPlatform
+	- 특정 주기로 가시성, 충돌 여부를 반전시켜 플레이어의 시야에서 사라짐과 동시에 떨어트리는 목적으로 제작된 Platform 입니다. 해당 플랫폼은 Tick을 사용하지 않고 FTimerHandle과 TimerManager를 사용하여 특정 주기로 변경되도록 만든 것이 특징입니다. 각 설정값들은 UE Editor에서 변경 및 수정 가능합니다.
 
 ```C++
 //header
