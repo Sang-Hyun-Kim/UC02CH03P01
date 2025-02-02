@@ -30,15 +30,99 @@
 
 ##### 기능
 
----C++
 
+```C++
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Puzzles|PuzzleSectors")
 	TArray<APuzzleSectorBase*> PuzzleSectors;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Puzzles|PuzzleSets")
 	TArray<TSubclassOf<UPuzzleSetBase>> PuzzleSets;
 
+	TArray<UPuzzleSetBase*> PuzzleSetObjects;
+```
+멤버 변수:
+- PuzzleSectors: 레벨 실행시 퍼즐 구역들이 저장되는 컨테이너 입니다.
+- PuzzleSets: Editor에서 BP로 생성한 PuzzleSetBase 서브 클래스들을 저장합니다.
+- PuzzleSetObjects:  Unreal Editor에서 수정 가능한 PuzzleSet을 받아 BeginPlay() 단계에서 객체들을 생성한 다음 퍼즐이 초기화 될 때 마다 해당 객체들을 재사용합니다.
+```C++
+	UFUNCTION(BlueprintCallable, Category = "Puzzles")
+	void RandomPuzzleGenerator();
+	// 레벨의 모든 PuzzleSector를 찾아서 추가하는 함수
+	UFUNCTION(BlueprintCallable, Category = "Puzzles")
+	void FindAllPuzzleSectors();
+	UFUNCTION(BlueprintCallable, Category = "Puzzles")
+	void ClearCurrentPuzzlesFromAllSectors();
+```
+
+멤버 함수:
+- FindAllPuzzleSectors: 레벨에 배치된 모든 PuzzleSector를 찾아 멤버 변수 컨테이너에 저장합니다.
+- ClearCurrentPuzzlesFromAllSectors: 저장된 Sector들에게 현재 저장된 퍼즐을 삭제하라고 전달합니다.
+- RandomPuzzleGenerator: 현재 저장된 Sector들에게 퍼즐을 재생성하라고 지시합니다.
+
 ---
 
-sdas
+#### PuzzleSetBase(퍼즐 도안)
+
+##### 개요
+PuzzleSetBase는 특정 퍼즐을 어떤 좌표에 배치할지에 대한 정보를 들고 있기 위한 클래스 입니다. 해당 클래스를 상속받는 클래스들은 필요에 맞게 각각 다른 퍼즐 종류와 좌표를 가지고 있습니다.
+
+```C++
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Puzzles")
+	TArray<TSubclassOf<AProjectPuzzlePlatform01>> Puzzles;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PuzzlesLocations")
+	TArray<FVector> PuzzleLocations;
+```
+
+멤버 변수:
+- Puzzles: UE Editor를 통해 퍼즐 BP들이 저장될 컨테이너입니다.
+- PuzzleLocations: 위와 동일한 방식으로 퍼즐들의 좌표를 저장합니다.
+
+##### 상속받는 각 서브 클래스들 
+
+- BP_PSet01_RotatingPlatforms: 
+```C++
+//header
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Puzzle|RotationSpeed")
+	float RotationSpeed;
+// cpp
+void APuzzle03RotatingLog::Tick(float DeltatTime)
+{
+	Super::Tick(DeltatTime);
+	RotatingRoot(DeltatTime);
+}
+
+void APuzzle03RotatingLog::RotatingRoot(float DeltaTime)
+{
+	FQuat QuatRotation = FQuat(FRotator(0.0f, RotationSpeed * DeltaTime,0.0f ));
+	AddActorLocalRotation(QuatRotation);
+}
+
+```
+
+ 회전하는 플랫폼들에서 떻어지지 않고 점프해 건너는 퍼즐 도안입니다. 프레임 단위로 회전하되, Gimbal Lock 현상이 발생해 해당 오류를 해결하기 위해 쿼터니안으로 회전을 하는 방법을 찾아 도입하였습니다.
+
+- BP_PSet02_Bridge : 회전하는 통나무를 피하면서 떨어지지 않게 플랫폼 사이를 건너는 퍼즐 도안입니다. 
+- BP_PSet03_ElevatingPlatforms: 위아래로 반복 운동하는 플랫폼을 타고 건너는 퍼즐 도안입니다. 
+- BP_PSet04_BlinkingSet: 3초마다 비활성화되는 플랫폼을 타고 건너는 퍼즐 도안입나다.
+  
+#### ProjectPuzzlePlatform01(퍼즐 플랫폼 베이스)
+
+##### 개요
+해당 클래스는 모든 Puzzle Platform 들이 상속받는 부모 클래스입니다. 처음 만들 때 모든 퍼즐의 Base가 될 줄 몰라 단순 퍼즐1번이란 의미로 이름을 지었다가, 결국 모든 퍼즐종류가 상속받는 부모클래스가 되었습니다. **다음부턴 꼭 설계를 제대로하고 이름을 짓자**라는 반성의 의미로 그대로 남겨 사용하였습니다,
+
+```C++
+public:	
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PuzzlePosition")
+	FVector PRLocation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PuzzlePosition")
+	FVector PRScale;
+```
+
+
+
+
 
