@@ -15,7 +15,7 @@
   2. 랜덤한 퍼즐 생성 
 ---
 ### 프로젝트 흐름도
-![Image](https://github.com/user-attachments/assets/507a3cc8-5f9c-4c04-9bf8-88369bf4ede4)
+![Image](https://github.com/user-attachments/assets/c092cea6-e3fd-4b52-8852-b869baa1fadc)
 
 처음 과제 프로젝트를 구상할 때 도전과제까지 반영한 게임의 예상 흐름도
 
