@@ -1,9 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Puzzle04MovingAndPushingObstacle.h"
-#include "TimerManager.h"
-
 
 APuzzle04MovingAndPushingObstacle::APuzzle04MovingAndPushingObstacle()
 {
@@ -27,7 +24,6 @@ APuzzle04MovingAndPushingObstacle::APuzzle04MovingAndPushingObstacle()
 
 	float NewMovementSpeed = FMath::RandRange(100.0f, 400.0f);
 	MovementSpeed = NewMovementSpeed;
-	PrimaryActorTick.bCanEverTick = false; // Tick 비활성화
 }
 
 void APuzzle04MovingAndPushingObstacle::BeginPlay()
@@ -38,12 +34,16 @@ void APuzzle04MovingAndPushingObstacle::BeginPlay()
 	MovementSpeed = NewMovementSpeed;
 
 	StartLocation = GetActorLocation(); // 시작 위치 저장
-	// 타이머 설정 (MoveInterval 간격으로 MovePlatform 호출)
-	GetWorld()->GetTimerManager().SetTimer(MoveTimerHandle, this, &APuzzle04MovingAndPushingObstacle::Moving, MoveInterval, true);
-
 }
 
-void APuzzle04MovingAndPushingObstacle::Moving()
+void APuzzle04MovingAndPushingObstacle::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	Moving(DeltaTime);
+}
+
+void APuzzle04MovingAndPushingObstacle::Moving(float DeltaTime)
 {
 	FVector CurrentLocation = GetActorLocation();
 
@@ -54,7 +54,7 @@ void APuzzle04MovingAndPushingObstacle::Moving()
 	}
 
 	// 이동 처리
-	FVector MoveOffset = MoveDirection * MovementSpeed * MoveInterval;
+	FVector MoveOffset = MoveDirection * MovementSpeed * DeltaTime;
 	SetActorLocation(CurrentLocation + MoveOffset);
 }
 
