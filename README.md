@@ -77,9 +77,35 @@ PuzzleSetBase는 특정 퍼즐을 어떤 좌표에 배치할지에 대한 정보
 - Puzzles: UE Editor를 통해 퍼즐 BP들이 저장될 컨테이너입니다.
 - PuzzleLocations: 위와 동일한 방식으로 퍼즐들의 좌표를 저장합니다.
 
-##### 상속받는 각 서브 클래스들 
+##### 상속하는 서브 클래스들 
 
-- BP_PSet01_RotatingPlatforms: 
+- BP_PSet01_RotatingPlatforms:  회전하는 플랫폼들에서 떻어지지 않고 점프해 건너는 퍼즐 도안입니다. 
+- BP_PSet02_Bridge : 회전하는 통나무를 피하면서 떨어지지 않게 플랫폼 사이를 건너는 퍼즐 도안입니다. 
+- BP_PSet03_ElevatingPlatforms: 위아래로 반복 운동하는 플랫폼을 타고 건너는 퍼즐 도안입니다. 
+- BP_PSet04_BlinkingSet: 3초마다 비활성화되는 플랫폼을 타고 건너는 퍼즐 도안입나다.
+
+ ---
+#### ProjectPuzzlePlatform01(퍼즐 플랫폼 베이스)
+
+##### 개요
+해당 클래스는 모든 Puzzle Platform 들이 상속받는 부모 클래스입니다. 처음 만들 때 모든 퍼즐의 Base가 될 줄 몰라 단순 퍼즐1번이란 의미로 이름을 지었다가, 결국 모든 퍼즐종류가 상속받는 부모클래스가 되었습니다. **다음부턴 꼭 설계를 제대로하고 이름을 짓자**라는 반성의 의미로 그대로 남겨 사용하였습니다,
+다만, 추가 확장을 위해 위치와 크기를 저장하도록 멤버 변수를 구현해놨습니다.
+```C++
+public:	
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PuzzlePosition")
+	FVector PRLocation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PuzzlePosition")
+	FVector PRScale;
+```
+
+
+##### 상속하는 서브 클래스들
+
+-Puzzle01Rotatingatform: 회전하는 플랫폼입니다. 프레임 단위로 회전하되, Gimbal Lock 현상이 발생해 해당 오류를 해결하기 위해 쿼터니안으로 회전을 하는 방법을 찾아 도입하였습니다. 또한 BeginPlay시 FMath::RandRange()로 랜덤한 속도를 생성해 각 퍼즐들이 랜덤한 속도로 회전하도록 구현했습니다.
 ```C++
 //header
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Puzzle|RotationSpeed")
@@ -99,30 +125,214 @@ void APuzzle03RotatingLog::RotatingRoot(float DeltaTime)
 
 ```
 
- 회전하는 플랫폼들에서 떻어지지 않고 점프해 건너는 퍼즐 도안입니다. 프레임 단위로 회전하되, Gimbal Lock 현상이 발생해 해당 오류를 해결하기 위해 쿼터니안으로 회전을 하는 방법을 찾아 도입하였습니다.
+-Puzzle02BridgePlatform: 단순 건너기위한 발판입니다. 다만 추가 확장을 위해 상속받아 사용했습니다.
+-Puzzle03RotatingLogPlatform: 위의 발판 플랫폼을 건너는 것을 방해하는 Yaw 축으로 회전하는 플랫폼입니다. 해당 플랫폼은 중심만 구현하였고, 이를 상속받는 BP에서 통나무를 달아 플레이어를 방해합니다. 해당 플랫폼 또한 게임 시작시 부여받은 랜덤한 속도로 회전합니다.
+-Puzzle044MovingAndPushingObstacle: 위, 아래로 반복운동하는 플랫폼입니다. 처음 시작시 생성된 랜덤한 속도로 Y축을 엘레베이터 발판처럼 이동합니다. **이 또한 처음 잘못 지은 이름을 반성**하는 의미로 사용했고 상속 받는 BP는 제대로 ElevatingPlatform 이란 이름으로 생성했습니다.
+```C++
+// hearder
+	UFUNCTION()
+	virtual void Moving(float DeltaTime);
 
-- BP_PSet02_Bridge : 회전하는 통나무를 피하면서 떨어지지 않게 플랫폼 사이를 건너는 퍼즐 도안입니다. 
-- BP_PSet03_ElevatingPlatforms: 위아래로 반복 운동하는 플랫폼을 타고 건너는 퍼즐 도안입니다. 
-- BP_PSet04_BlinkingSet: 3초마다 비활성화되는 플랫폼을 타고 건너는 퍼즐 도안입나다.
-  
-#### ProjectPuzzlePlatform01(퍼즐 플랫폼 베이스)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Puzzle|MovementSpeed")
+    float MovementSpeed = 200.0f;
 
-##### 개요
-해당 클래스는 모든 Puzzle Platform 들이 상속받는 부모 클래스입니다. 처음 만들 때 모든 퍼즐의 Base가 될 줄 몰라 단순 퍼즐1번이란 의미로 이름을 지었다가, 결국 모든 퍼즐종류가 상속받는 부모클래스가 되었습니다. **다음부턴 꼭 설계를 제대로하고 이름을 짓자**라는 반성의 의미로 그대로 남겨 사용하였습니다,
+	int movementflag = 1;
+
+    /** 왕복 거리 */
+    UPROPERTY(EditAnywhere, Category = "Movement")
+    float TravelDistance = 500.0f; // 500 유닛 왕복
+
+    /** 이동 방향 */
+    FVector MoveDirection = FVector(0.0f, 0.0f, 1.0f); // X축 방향 이동
+
+    /** 시작 위치 */
+    FVector StartLocation;
+
+//cpp
+void APuzzle04MovingAndPushingObstacle::BeginPlay()
+{
+	Super::BeginPlay();
+
+	float NewMovementSpeed = FMath::RandRange(20.0f, 200.0f);
+	MovementSpeed = NewMovementSpeed;
+
+	StartLocation = GetActorLocation(); // 시작 위치 저장
+}
+
+void APuzzle04MovingAndPushingObstacle::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	Moving(DeltaTime);
+}
+
+void APuzzle04MovingAndPushingObstacle::Moving(float DeltaTime)
+{
+	FVector CurrentLocation = GetActorLocation();
+
+	// 목표 위치 도달 시 방향 반전
+	if (FVector::Dist(StartLocation, CurrentLocation) >= TravelDistance)
+	{
+		MoveDirection *= -1.0f;
+	}
+
+	// 이동 처리
+	FVector MoveOffset = MoveDirection * MovementSpeed * DeltaTime;
+	SetActorLocation(CurrentLocation + MoveOffset);
+}
+
+```
+
+-Puzzle05BlinkPlatform: 특정 주기로 가시성, 충돌 여부를 반전시켜 플레이어의 시야에서 사라짐과 동시에 떨어트리는 목적으로 제작된 Platform 입니다. 해당 플랫폼은 Tick을 사용하지 않고 FTimerHandle과 TimerManager를 사용하여 특정 주기로 변경되도록 만든 것이 특징입니다. 각 설정값들은 UE Editor에서 변경 및 수정 가능합니다.
 
 ```C++
+//header
+	APuzzle05BlinkPlatform();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	USceneComponent* SceneRoot;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UStaticMeshComponent* Root;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float ToggleTimer = 5.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bIsActive;
+
+	virtual void BeginPlay() override;
+public:
+
+	// 타이머 핸들
+	FTimerHandle TimerHandle;
+
+
+
+	UFUNCTION()
+	void TogglePlatformState();
+//cpp
+	PrimaryActorTick.bCanEverTick = false;
+void APuzzle05BlinkPlatform::BeginPlay()
+{
+	Super::BeginPlay();
+	TogglePlatformState();
+	// 타이머 설정: 5초마다 상태를 변경
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &APuzzle05BlinkPlatform::TogglePlatformState, ToggleTimer, true);
+
+
+}
+
+void APuzzle05BlinkPlatform::TogglePlatformState()
+{
+	// 상태를 반전시킵니다
+	if (bIsActive)
+	{
+		bIsActive = false;
+	}
+	else
+	{
+		bIsActive = true;
+	}
+
+	Root->SetVisibility(bIsActive);
+	SetActorEnableCollision(bIsActive); // 충돌을 활성화/비활성화
+}
+```
+---
+#### PuzzlESectorBase(퍼즐 구역)
+
+##### 개요
+PuzzleSectorBase는 퍼즐이 생성될 구역을 구현한 클래스입니다. 해당 클래스를 상속받는 BP 클래스는 레벨에 배치되어 PuzzleManager에 관리하에 퍼즐 랜덤 생성, 삭제를 수행합니다.
+
+
+```C++
+	APuzzleSectorBase();
+
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	void ActorSpawnByPuzzleSet(UPuzzleSetBase* set);
+	void ClearSector();
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PuzzlePosition")
-	FVector PRLocation;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PuzzlePosition")
-	FVector PRScale;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Puzzles|Components")
+	TArray<TSubclassOf<AProjectPuzzlePlatform01>> PuzzleArray;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Puzzles|Components")
+	TArray<FVector> PuzzleLocations;
+	
+	TArray<AProjectPuzzlePlatform01*> CurSpawnedPlatforms;
 ```
+클래스 특징으로는 생성되는 퍼즐들을 컨테이너에 보관한 다음 삭제하는 것으로 메모리 관리에 신경썼습니다.
+
+```C++
+void APuzzleSectorBase::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
+// Called every frame
+void APuzzleSectorBase::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+}
+
+void APuzzleSectorBase::ActorSpawnByPuzzleSet(UPuzzleSetBase* set)
+{
+	// 넘겨받은 도면에 대해 랜덤 생성
+	if (set->PuzzleLocations.Num() != set->Puzzles.Num())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("퍼즐 개수와 퍼즐 좌표 개수가 맞지 않습니다"));
+		return;
+	}
+	else
+	{
+		UWorld* pworld = GetWorld();
+		if (!pworld)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("No World Error"));
+			return;
+		}
+		INT32 PuzzleNum = set->Puzzles.Num();
+		FTransform CurSectorBaseTransform = GetActorTransform();
+		for (int i = 0; i < PuzzleNum; ++i)
+		{
+			FVector CurPuzzleLocation = CurSectorBaseTransform.GetLocation() + set->PuzzleLocations[i];
+
+			AProjectPuzzlePlatform01* CurPuzzle = pworld->SpawnActor<AProjectPuzzlePlatform01>(
+				set->Puzzles[i], CurPuzzleLocation, FRotator::ZeroRotator
+			);
+			if (CurPuzzle)
+			{
+				CurSpawnedPlatforms.Add(CurPuzzle);
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("No PlatformData in Set_Array so No Platform Spawned"));
+			}
+		}
+	}
+}
+
+void APuzzleSectorBase::ClearSector()
+{
+	for (AProjectPuzzlePlatform01* CurSpawnedPlatform : CurSpawnedPlatforms)
+	{
+		CurSpawnedPlatform->Destroy();
+	}
+}
+```
+---
+#### 시연 영상
+
+---
+
+#### 후기
 
 
-
-
-
+---
